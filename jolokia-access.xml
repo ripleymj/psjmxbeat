@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<restrict>
+
+  <remote>
+    <host>127.0.0.1</host>
+  </remote>
+
+  <http>
+    <method>post</method>
+  </http>
+
+  <commands>
+    <command>read</command>
+  </commands>
+
+</restrict>

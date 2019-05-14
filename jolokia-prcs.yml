@@ -1,0 +1,28 @@
+# Module: jolokia
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.0/metricbeat-module-jolokia.html
+
+- module: jolokia
+  metricsets: ["jmx"]
+  period: 10s
+  hosts: ["localhost:7779"]
+  namespace: "metrics"
+  path: "/jolokia/?canonicalNaming=false"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
+  jmx.mappings:
+    - mbean: 'com.peoplesoft:Name=*,Type=DomainRuntime'
+      attributes:
+        - attr: ServerCount
+          field: prcs.PrcAllServerCount
+        - attr: Health
+          field: prcs.PrcHealth
+        - attr: Load
+          field: prcs.PrcLoadState
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoServerRuntime,Name=PSAESRV_*'
+      attributes:
+        - attr: TotalRequestCount
+          field: prcs.TotalRequestCount
+
+  jmx.application:
+  jmx.instance:

@@ -1,0 +1,115 @@
+# Module: jolokia
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.0/metricbeat-module-jolokia.html
+
+- module: jolokia
+  metricsets: ["jmx"]
+  period: 10s
+  hosts: ["localhost:7777", "localhost:7778"]
+  namespace: "metrics"
+  path: "/jolokia/?canonicalNaming=false"
+  #path: "/jolokia/?ignoreErrors=true&canonicalNaming=false"
+  #username: "user"
+  #password: "secret"
+  jmx.mappings:
+    - mbean: 'com.peoplesoft:Name=*,Type=DomainRuntime'
+      attributes:
+        - attr: Health
+          field: app.health
+          event: domainruntime
+        - attr: Load
+          field: app.load
+          event: domainruntime
+        - attr: ServerCount
+          field: app.server_count
+          event: domainruntime
+        - attr: ServerDownCount
+          field: app.server_down_count
+          event: domainruntime
+        - attr: ClientCount
+          field: app.client_count
+          event: domainruntime
+        - attr: LongRunningRequestCount
+          field: app.long_running_request_count
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoServerRuntime,Name=PSAPPSRV_*'
+      attributes:
+        - attr: TotalRequestCount
+          field: app.requests_total
+          event: domainruntime
+        - attr: Troughput
+          field: app.request_per_sec_total
+          event: domainruntime
+    - mbean: 'com.peoplesoft:Server=PSAPPSRV,Instance=*,Type=ManagedObjectCacheRuntime'
+      attributes:
+        - attr: TotalMemorySize
+          field: app.cache_memory_size_kb
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoQueueRuntime,Name=APPQ'
+      attributes:
+        - attr: ServerCount
+          field: app.queue.server_count
+        - attr: Throughput
+          field: app.queue.requests_per_sec
+        - attr: CurrentQueueDepth
+          field: app.queue.depth
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoQueueRuntime,Name=SUBHQ_*'
+      attributes:
+        - attr: Throughput
+          field: app.ib.sub_requests_per_sec
+          event: domainruntime
+        - attr: CurrentQueueDepth
+          field: app.ib.sub_max_queue_depth
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoQueueRuntime,Name=PUBHQ_*'
+      attributes:
+        - attr: Throughput
+          field: app.ib.pub_requests_per_sec
+          event: domainruntime
+        - attr: CurrentQueueDepth
+          field: app.ib.pub_max_queue_depth  
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=NetworkStatisticsRuntime'
+      attributes:
+        - attr: TCPSocketsInCloseWaitState
+          field: app.tcp.close_wait_state
+          event: domainruntime
+        - attr: TCPSocketsInTimeWaitState
+          field: app.tcp.time_wait_state
+          event: domainruntime
+        - attr: TCPSocketsInEstablishedState
+          field: app.tcp.established_state
+          event: domainruntime
+        - attr: TCPSocketsInFINWait1State
+          field: app.tcp.fin_wait1_state
+          event: domainruntime
+        - attr: TCPSocketsInFINWait2State
+          field: tcp.fin_wait2_state
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoClientRuntime,CLIENTID=*'
+      attributes:
+        - attr: TransactionsAbortedCount
+          field: app.client_trans_aborted_count
+          event: domainruntime
+    - mbean: 'com.peoplesoft:Server=PSAPPSRV,Instance=*,Type=RequestExecutorRuntime'
+      attributes:
+        - attr: AverageProcessingTime
+          field: app.request_process_time_ms_avg
+          event: domainruntime
+        - attr: AverageTotalServiceTime
+          field: app.request_service_time_ms_avg
+          event: domainruntime
+    - mbean: 'com.peoplesoft:DomainRuntime=*,Type=TuxedoServerRuntime,Name=PSAPPSRV_*'
+      attributes:
+        - attr: CurrentService
+          field: app.psappsrv_active_pct 
+
+
+#    - metricName: psappsrv_active_pct
+#      role: app
+#      attrType: pct
+#      jmxClass: "com.peoplesoft:DomainRuntime=*,Type=TuxedoServerRuntime,Name=PSAPPSRV_*"
+#      jmxAttrName: CurrentService
+#      attrWhere: "!IDLE"
+
+  jmx.application:
+  jmx.instance:
